@@ -1,6 +1,6 @@
 # Example Java Kafka Consumer
 
-[![Build Status](https://travis-ci.com/pactflow/example-consumer-js-kafka.svg?token=Kys1s4kjp8EWzwqKWwhy&branch=master)](https://travis-ci.com/pactflow/example-consumer-js-kafka)
+[![Build Status](https://travis-ci.com/pactflow/example-consumer-java-kafka.svg?branch=master)](https://travis-ci.com/pactflow/example-consumer-java-kafka)
 
 This is an example of a Java kafka consumer that uses Pact, [Pactflow](https://pactflow.io) and Travis CI to ensure that it is compatible with the expectations its consumers have of it.
 
