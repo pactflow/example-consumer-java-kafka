@@ -11,7 +11,7 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 script:
-- "./gradlew clean test"
+- make ci
 env:
   global:
   - secure: cfraD6KRon2uVe84GECB/W2H/ZoePrivrQGY1AwmBleCVFMJh3uBnsQHpVJNwDz3SzaPVVK1ZbVrHKBbYmNet6WWAPeE1rUzHBXenpzF5BAHQJG5RQrtbVZG5gOCRJ3lpEk58W6DbNWqOsDWr0/Auvi6on5HKdSMfbHY51A7lVhO73tk3+thtTy5wdjg6vTlZwfptoHUQyJ+jcVEwMTaGTC5UyfbLpBF9mPRrc7uaRm+9EqsISxxVaJOTijWeSwgeVD14hIFTgR2NhK/9jEhn1j3wV6302vhUanBAB8+u9htllDg6xYgautRPX4bnBsghHgbwzKJzUGiXZ3v1InObEhaXd1Aew9nfSZ28gHZMU+8x+Lx6ZgkCdtG6LCsdL0ByplOOGFtB60bLC7weluiuuSJJ2+d57wKY4/+jA+xHhZDqOdMb3N9oKY9LgcuMtPWDr8pz+3LHFI+uFXMyEEKUd8rFhkZzmveF2goYTSi+WPQFk5XqWB3bt/qB/jM0luavzig5WQg4+cHyflmXAqZwmapk4Q/GuAp10+qv3Fwqcz9MS8OF2i3fIUh6U8YwrcDKaILYqwmJFDidErdLxE5gFDhdoq1bz0pmEKnChhY1X7CMK/WrigWZIrBZzl75aKAI7MXoAScgPzUjmsraEzMmR0PT53WHrDOhfpUmhZioFo=
