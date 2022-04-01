@@ -1,11 +1,11 @@
-# Default to the read only token - the read/write token will be present on Travis CI.
-# It's set as a secure environment variable in the .travis.yml file
+# Default to the read only token - the read/write token will be present on GitHub Actions.
+# It's set as a secure environment variable in the build.yml file
 PACTICIPANT := "pactflow-example-consumer-java-kafka"
 GITHUB_WEBHOOK_UUID := "654aff47-0269-4b9f-aaca-2f83ff3cd772"
 PACT_CLI="docker run --rm -v ${PWD}:${PWD} -e PACT_BROKER_BASE_URL -e PACT_BROKER_TOKEN pactfoundation/pact-cli:latest"
 
 # Only deploy from master
-ifeq ($(TRAVIS_BRANCH),master)
+ifeq ($(GIT_BRANCH),master)
 	DEPLOY_TARGET=deploy
 else
 	DEPLOY_TARGET=no_deploy
@@ -20,17 +20,17 @@ all: test
 ci: test publish_pacts can_i_deploy $(DEPLOY_TARGET)
 
 # Run the ci target from a developer machine with the environment variables
-# set as if it was on Travis CI.
+# set as if it was on GitHub Actions.
 # Use this for quick feedback when playing around with your workflows.
 fake_ci: .env
 	CI=true \
-	TRAVIS_COMMIT=`git rev-parse --short HEAD`+`date +%s` \
-	TRAVIS_BRANCH=`git rev-parse --abbrev-ref HEAD` \
+	GIT_COMMIT=`git rev-parse --short HEAD`+`date +%s` \
+	GIT_BRANCH=`git rev-parse --abbrev-ref HEAD` \
 	make ci
 
 
 publish_pacts: .env
-	@"${PACT_CLI}" publish ${PWD}/build/pacts --consumer-app-version ${TRAVIS_COMMIT} --tag ${TRAVIS_BRANCH}
+	@"${PACT_CLI}" publish ${PWD}/build/pacts --consumer-app-version ${GIT_COMMIT} --tag ${GIT_BRANCH}
 
 ## =====================
 ## Build/test tasks
@@ -43,7 +43,7 @@ test: .env
 ## Deploy tasks
 ## =====================
 
-deploy: deploy_app tag_as_prod
+deploy: deploy_app tag_as_prod record_deployment
 
 no_deploy:
 	@echo "Not deploying as not on master branch"
@@ -51,7 +51,7 @@ no_deploy:
 can_i_deploy: .env
 	@"${PACT_CLI}" broker can-i-deploy \
 	  --pacticipant ${PACTICIPANT} \
-	  --version ${TRAVIS_COMMIT} \
+	  --version ${GIT_COMMIT} \
 	  --to prod \
 	  --retry-while-unknown 0 \
 	  --retry-interval 10
@@ -60,7 +60,10 @@ deploy_app:
 	@echo "Deploying to prod"
 
 tag_as_prod: .env
-	@"${PACT_CLI}" broker create-version-tag --pacticipant ${PACTICIPANT} --version ${TRAVIS_COMMIT} --tag prod
+	@"${PACT_CLI}" broker create-version-tag --pacticipant ${PACTICIPANT} --version ${GIT_COMMIT} --tag prod
+
+record_deployment: .env
+	@"${PACT_CLI}" broker record-deployment --pacticipant ${PACTICIPANT} --version ${GIT_COMMIT} --environment production
 
 ## =====================
 ## Pactflow set up tasks
@@ -81,7 +84,7 @@ create_github_token_secret:
 create_or_update_github_webhook:
 	@"${PACT_CLI}" \
 	  broker create-or-update-webhook \
-	  'https://api.github.com/repos/pactflow/example-consumer-java-kafka/statuses/$${pactbroker.consumerVersionNumber}' \
+	  'https://api.github.com/repos/pactflow/example-consumer-java-junit/statuses/$${pactbroker.consumerVersionNumber}' \
 	  --header 'Content-Type: application/json' 'Accept: application/vnd.github.v3+json' 'Authorization: token $${user.githubCommitStatusToken}' \
 	  --request POST \
 	  --data @${PWD}/pactflow/github-commit-status-webhook.json \
@@ -93,17 +96,6 @@ create_or_update_github_webhook:
 
 test_github_webhook:
 	@curl -v -X POST ${PACT_BROKER_BASE_URL}/webhooks/${GITHUB_WEBHOOK_UUID}/execute -H "Authorization: Bearer ${PACT_BROKER_TOKEN}"
-
-## ======================
-## Travis CI set up tasks
-## ======================
-
-travis_login:
-	@docker run --rm -v ${HOME}/.travis:/root/.travis -it lirantal/travis-cli login --pro
-
-# Requires PACT_BROKER_TOKEN to be set
-travis_encrypt_pact_broker_token:
-	@docker run --rm -v ${HOME}/.travis:/root/.travis -v ${PWD}:${PWD} --workdir ${PWD} lirantal/travis-cli encrypt --pro PACT_BROKER_TOKEN="${PACT_BROKER_TOKEN}"
 
 ## ======================
 ## Misc
@@ -125,9 +117,9 @@ docker:
 	@docker-compose -f kafka-cluster.yml up -d --no-recreate
 
 start: docker
-	npm start
+	./gradlew bootRun
 
 test-events:
-	npm run test:events
+	docker exec -it pactflow-example-consumer-java-kafka_kafka_1 /tmp/scripts/producer.sh
 
 .PHONY: test start docker docker-stop docker-rm docker-logs
