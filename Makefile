@@ -1,4 +1,4 @@
-# Default to the read only token - the read/write token will be present on Travis CI.
+# Default to the read only token - the read/write token will be present on GitHub Actions.
 # It's set as a secure environment variable in the build.yml file
 PACTICIPANT := "pactflow-example-consumer-java-kafka"
 GITHUB_WEBHOOK_UUID := "654aff47-0269-4b9f-aaca-2f83ff3cd772"
