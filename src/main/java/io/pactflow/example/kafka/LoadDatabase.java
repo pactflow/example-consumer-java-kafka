@@ -13,8 +13,8 @@ class LoadDatabase {
   @Bean
   CommandLineRunner initDatabase(ProductRepository repository) {
     return args -> {
-      log.info("Preloading " + repository.save(new Product("1", "Burger", "Aussie with avocade, egg, bacon and beetroot", "v2", "CREATED")));
-      log.info("Preloading " + repository.save(new Product("2" , "Chips", "Sweet potato fries", "v1", "UPDATED")));
+      log.info("Preloading " + repository.save(new Product("1", "Burger", "Aussie with avocade, egg, bacon and beetroot", "v2", "CREATED", 11.99)));
+      log.info("Preloading " + repository.save(new Product("2" , "Chips", "Sweet potato fries", "v1", "UPDATED", 12.99)));
     };
   }
 }
